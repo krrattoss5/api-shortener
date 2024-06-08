@@ -8,20 +8,21 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const SECRET_KEY = '19568514Lj.'
 const prisma = new PrismaClient()
+const cors = require('cors')
 
 // app.name('api-shortener')
+// Configuración de CORS
 
 app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(cookieParser());
 app.use(morgan('dev'));
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*'); // update to match the domain you will make the request from
-  res.header('Access-Control-Allow-Credentials', 'true');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
-  next();
-});
+app.use(cors({
+  origin: '*',
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization'], // Asegúrate de permitir 'Authorization'
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+}));
 
 const authenticateToken = (req, res, next) => {
   const token = req.headers['authorization'];
@@ -76,12 +77,12 @@ app.post('/create-user', async (req, res) => {
 })
 
 app.post('/login', async (req, res) => {
-  const {username, password} = req.body
+  const {email, password} = req.body
 
   try {
     const user = await prisma.user.findUnique({
       where:{
-        username
+        email:email
       }
     })
 
@@ -102,18 +103,36 @@ app.post('/login', async (req, res) => {
 
 })
 
-// crear token
+app.get('/me', authenticateToken, async (req, res) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where:{
+        id: req.user.userId
+      },
+      include:{
+        links: true
+      }
+    })
+    return res.status(200).json(user)
+  } catch (error) {
+    return res.status(400).json({message: error.message})
+  }
+})
 
-app.post('/', async (req, res) => {
+app.post('/',authenticateToken, async (req, res) => {
   const {url} = req.body
   const shortUrl = Math.random().toString(36).substring(2,7)
 
   try {
-    const data = await prisma.link.create({
-      data: {url, shortUrl}
+    const link = await prisma.link.create({
+      data: {
+        url,
+        shortUrl,
+        userId: req.user.userId
+      }
     })
 
-    return res.status(200).json(data)
+    return res.status(200).json(link)
   } catch (error) {
     return res.status(500).json({message: error.message})
   }
