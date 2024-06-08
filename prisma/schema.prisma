@@ -13,9 +13,22 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id Int @id @default(autoincrement()) @unique
+  email String @unique
+  password String
+  username String @unique
+  name String
+  lastname String
+  createdAt DateTime @default(now())
+  links Link[]
+}
+
 model Link {
   id  Int   @id @default(autoincrement()) @unique
   url String    @unique
   shortUrl String @unique
   createdAt DateTime @default(now())
+  userId Int
+  user User @relation(fields: [userId], references: [id])
 }

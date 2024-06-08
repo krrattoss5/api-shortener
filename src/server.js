@@ -21,6 +21,43 @@ app.use((req, res, next) => {
   next();
 });
 
+app.post('/create-user', async (req, res) => {
+  const {
+    email,
+    password,
+    username,
+    name,
+    lastname,
+  } = req.body
+
+  try {
+    const existUser = await prisma.user.findUnique({
+      where: {
+        email: email,
+        username: username
+      }
+    })
+
+    if(existUser) return res.status(403).json({message: 'El usuario ya existe!'})
+
+    const user = await prisma.user.create({
+      data: {
+        email,
+        password,
+        username,
+        name,
+        lastname,
+      }
+    })
+
+    console.log(user)
+
+    return res.status(200).json(user)
+  } catch (error) {
+    return res.status(500).json({message: error.message})
+  }
+
+})
 app.post('/', async (req, res) => {
   const {url} = req.body
   const shortUrl = Math.random().toString(36).substring(2,7)
@@ -30,6 +67,8 @@ app.post('/', async (req, res) => {
       data: {url, shortUrl}
     })
 
+    console.log(data)
+
     return res.status(200).json(data)
   } catch (error) {
     return res.status(500).json({message: error.message})
@@ -37,25 +76,27 @@ app.post('/', async (req, res) => {
 
 })
 
-app.get('/:id', async (req,res) => {
+app.get('/:shortId', async (req,res) => {
   const {shortId} = req.params
 
-    const data = await prisma.link.findUnique({
-      where: {
-        shortUrl: shortId
-      }
-    })
-
     try {
+
+      const data = await prisma.link.findUnique({
+        where: {
+          shortUrl: shortId
+        }
+      })
+
+      const request = await fetch("https://ipinfo.io/json?token=754f00ca799206")
+      const jsonResponse = await request.json()
+
+      console.log(jsonResponse)
+
       if(!data){
-        throw Error('URL Not found!')
+        return res.status(404).json({message: 'URL Not found!'})
       }
 
-      return {
-        redirect: {
-          destination: data.url
-        }
-      }
+      return res.redirect(data.url)
     } catch (error) {
       res.status(500).json({message: error.message})
     }
