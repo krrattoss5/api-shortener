@@ -5,7 +5,8 @@ const morgan = require('morgan')
 const app = express()
 const {PrismaClient} = require('@prisma/client')
 const bcrypt = require('bcrypt')
-
+const jwt = require('jsonwebtoken')
+const SECRET_KEY = '19568514Lj.'
 const prisma = new PrismaClient()
 
 // app.name('api-shortener')
@@ -21,6 +22,18 @@ app.use((req, res, next) => {
   res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
   next();
 });
+
+const authenticateToken = (req, res, next) => {
+  const token = req.headers['authorization'];
+  if (!token) return res.sendStatus(401);
+
+  jwt.verify(token, SECRET_KEY, (err, user) => {
+    if (err) return res.sendStatus(403);
+    req.user = user;
+    next();
+  });
+};
+
 
 app.post('/create-user', async (req, res) => {
   const {
@@ -61,6 +74,36 @@ app.post('/create-user', async (req, res) => {
   }
 
 })
+
+app.post('/login', async (req, res) => {
+  const {username, password} = req.body
+
+  try {
+    const user = await prisma.user.findUnique({
+      where:{
+        username
+      }
+    })
+
+    if(!user){
+      return res.status(404).json({message: 'Usuario inexistente!'})
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password)
+    if(!isPasswordValid){
+      return res.status(400).json({message: 'Usuario ó Contraseña invalidos'})
+    }
+
+    const token = await jwt.sign({userId: user.id}, SECRET_KEY, {expiresIn: '1h'})
+    return res.json({token})
+  } catch (error) {
+    return res.status(500).json({message: error.message})
+  }
+
+})
+
+// crear token
+
 app.post('/', async (req, res) => {
   const {url} = req.body
   const shortUrl = Math.random().toString(36).substring(2,7)
@@ -69,8 +112,6 @@ app.post('/', async (req, res) => {
     const data = await prisma.link.create({
       data: {url, shortUrl}
     })
-
-    console.log(data)
 
     return res.status(200).json(data)
   } catch (error) {
