@@ -4,6 +4,7 @@ const cookieParser = require('cookie-parser')
 const morgan = require('morgan')
 const app = express()
 const {PrismaClient} = require('@prisma/client')
+const bcrypt = require('bcrypt')
 
 const prisma = new PrismaClient()
 
@@ -38,21 +39,23 @@ app.post('/create-user', async (req, res) => {
       }
     })
 
-    if(existUser) return res.status(403).json({message: 'El usuario ya existe!'})
+    if(existUser){
+       return res.status(403).json({message: 'El usuario ya existe!'})
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10)
 
     const user = await prisma.user.create({
       data: {
         email,
-        password,
+        password: hashedPassword,
         username,
         name,
         lastname,
       }
     })
 
-    console.log(user)
-
-    return res.status(200).json(user)
+    return res.status(200).json({message: 'Usuario registrado con exito!'})
   } catch (error) {
     return res.status(500).json({message: error.message})
   }
