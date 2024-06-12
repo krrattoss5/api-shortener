@@ -26,9 +26,10 @@ model User {
 
 model Link {
   id  Int   @id @default(autoincrement()) @unique
-  url String    @unique
+  url String
   shortUrl String @unique
   createdAt DateTime @default(now())
   userId Int
   user User @relation(fields: [userId], references: [id])
+  clicks Int
 }

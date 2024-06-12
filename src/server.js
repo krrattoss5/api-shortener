@@ -86,7 +86,7 @@ app.post('/login', async (req, res) => {
       }
     })
 
-    if(!user){
+    if(!user?.id){
       return res.status(404).json({message: 'Usuario inexistente!'})
     }
 
