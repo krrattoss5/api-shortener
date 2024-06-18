@@ -18,8 +18,7 @@ const createUser = async (req, res) => {
   try {
     const existUser = await prisma.user.findUnique({
       where: {
-        email: email,
-        username: username
+        email: email
       }
     })
 
