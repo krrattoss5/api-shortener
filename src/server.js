@@ -14,7 +14,7 @@ app.use(cors({
   origin: '*',
   credentials: true,
   allowedHeaders: ['Content-Type', 'Authorization'],
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
 }));
 
 app.use('/',router)
