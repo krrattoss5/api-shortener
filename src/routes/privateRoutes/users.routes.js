@@ -2,10 +2,11 @@ const { Router } = require('express')
 const router = Router()
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
-const SECRET_KEY = '19568514Lj.'
 const {PrismaClient} = require('@prisma/client')
 const prisma = new PrismaClient()
 const authenticateToken = require('../../controllers/authenticateToken.js')
+require('dotenv').config()
+const {SECRET_KEY} = process.env
 
 router.post('/create-user', async (req, res) => {
   const {
