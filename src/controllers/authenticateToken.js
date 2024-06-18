@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken')
+const SECRET_KEY = '19568514Lj.'
 
 const authenticateToken = (req, res, next) => {
   const token = req.headers['authorization'];

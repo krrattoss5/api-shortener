@@ -98,7 +98,7 @@ router.get('/me', authenticateToken, async (req, res) => {
 })
 
 router.post('/updatePassword', authenticateToken, async (req, res) => {
-  const { currentPassword, newPassword, confirmPassword } = req.body;
+  const { currentPassword, newPassword } = req.body;
 
 
   try {
@@ -139,8 +139,8 @@ router.post('/updatePreferences', authenticateToken, async (req, res) => {
 
 router.delete('/deleteAccount', authenticateToken, async (req, res) => {
   try {
-    await prisma.user.delete({ where:
-      {
+    await prisma.user.delete({
+      where:{
         id: req.user.userId
       }
     });
