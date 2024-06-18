@@ -89,8 +89,9 @@ const getCurrentUser = async (req, res) => {
     })
 
     const countries = await prisma.country.findMany()
+    delete user.password
 
-    return res.status(200).json({...user,password:'',countries: countries})
+    return res.status(200).json({...user,countries: countries})
   } catch (error) {
     return res.status(400).json({message: error.message})
   }
