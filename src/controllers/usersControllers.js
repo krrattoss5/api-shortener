@@ -6,6 +6,7 @@ require('dotenv').config()
 const {SECRET_KEY} = process.env
 
 const createUser = async (req, res) => {
+  console.log('entro')
   const {
     email,
     password,
