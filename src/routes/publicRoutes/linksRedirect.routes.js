@@ -10,7 +10,7 @@ router.get('/:shortId', async (req,res) => {
   console.log(userIP)
   console.log('====================================')
     try {
-      const testAll = await fetch(`https://ipinfo.io/[${userIP.slice(0,userIP.indexOf(','))}]?token=754f00ca799206`)
+      const testAll = await fetch(`https://ipinfo.io/${userIP.slice(0,userIP.indexOf(','))}?token=754f00ca799206`)
       const responseAll = await testAll.json()
 
       console.log('====================================');
