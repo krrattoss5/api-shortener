@@ -10,6 +10,12 @@ router.get('/:shortId', async (req,res) => {
   console.log(userIP)
   console.log('====================================')
     try {
+      const testAll = await fetch(`https://ipinfo.io/[${userIP}]?token=754f00ca799206`)
+      const responseAll = await testAll.json()
+
+      console.log('====================================');
+      console.log(responseAll);
+      console.log('====================================');
 
       const link = await prisma.link.findUnique({
         where: {
