@@ -4,8 +4,11 @@ const {PrismaClient} = require('@prisma/client')
 const prisma = new PrismaClient()
 
 router.get('/:shortId', async (req,res) => {
+  const userIP = req.headers['x-forwarded-for'] || req.connection.remoteAddress
   const {shortId} = req.params
-
+  console.log('====================================')
+  console.log(userIP)
+  console.log('====================================')
     try {
 
       const link = await prisma.link.findUnique({
