@@ -10,14 +10,7 @@ router.get('/:shortId', async (req,res) => {
   console.log(userIP)
   console.log('====================================')
     try {
-      const testAll = await fetch(`https://ipinfo.io/${userIP.slice(0,userIP.indexOf(','))}?token=754f00ca799206`)
-      const responseAll = await testAll.json()
-
-      console.log('====================================');
-      console.log(responseAll);
-      console.log('====================================');
-
-      const link = await prisma.link.findUnique({
+        const link = await prisma.link.findUnique({
         where: {
           shortUrl: shortId
         },
@@ -30,7 +23,7 @@ router.get('/:shortId', async (req,res) => {
         return res.status(404).json({message: 'URL Not found!'})
       }
 
-      const response = await fetch("https://ipinfo.io/json?token=754f00ca799206")
+      const response = await fetch(`https://ipinfo.io/${userIP.slice(0,userIP.indexOf(','))}?token=754f00ca799206`)
       const jsonResponse = await response.json()
       const countryName = jsonResponse?.country
 
