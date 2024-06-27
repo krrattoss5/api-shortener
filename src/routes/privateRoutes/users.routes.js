@@ -19,6 +19,6 @@ router.post('/updatePassword', authenticateToken, updatePassword);
 
 router.post('/updatePreferences', authenticateToken, updatePreferences);
 
-router.delete('/deleteAccount', authenticateToken, );
+router.delete('/deleteAccount', authenticateToken,);
 
 module.exports = router
